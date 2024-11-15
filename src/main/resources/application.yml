@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: book-service
+  datasource:
+    url: ${BOOK_DB_POSTGRES_URL}
+    username: ${BOOK_DB_POSTGRES_USER}
+    password: ${BOOK_DB_POSTGRES_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+server:
+  port: 8082
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE}
