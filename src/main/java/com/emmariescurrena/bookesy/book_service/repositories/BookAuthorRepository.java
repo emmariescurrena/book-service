@@ -7,9 +7,8 @@ import org.springframework.stereotype.Repository;
 
 import com.emmariescurrena.bookesy.book_service.models.BookAuthor;
 
-
 @Repository
 public interface BookAuthorRepository extends JpaRepository<BookAuthor, Long> {
-    List<BookAuthor> findByAuthorId(String authorId);
-    List<BookAuthor> findByBookId(String bookId);
+    List<BookAuthor> findByAuthor_Id(String authorId);
+    List<BookAuthor> findByBook_Id(String bookId);
 }
