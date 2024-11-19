@@ -21,6 +21,9 @@ public class Book {
     @NotEmpty(message = "The title is required")
     private String title;
 
+    private String subtitle;
+
+    @Column(nullable = false)
     private String description;
 
     private LocalDate publishDate;
