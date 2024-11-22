@@ -1,14 +1,14 @@
 package com.emmariescurrena.bookesy.book_service.services;
 
-import java.util.List;
-
 import com.emmariescurrena.bookesy.book_service.dtos.ExternalAuthorApiDto;
 import com.emmariescurrena.bookesy.book_service.dtos.ExternalBookApiDto;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 public interface ExternalBookApiService {
-
-    public abstract List<String> searchBooksIds(String bookName, Integer page);
-    public abstract ExternalBookApiDto getBook(String bookId);
-    public abstract ExternalAuthorApiDto getAuthor(String authorId);
-
+    Flux<String> searchBooksIds(String bookName, Integer page);
+    Mono<? extends ExternalBookApiDto> getBook(String bookId);
+    Mono<? extends ExternalAuthorApiDto> getAuthor(String authorId);
 }
+
