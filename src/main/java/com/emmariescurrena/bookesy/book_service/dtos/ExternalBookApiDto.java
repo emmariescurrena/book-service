@@ -8,12 +8,12 @@ import lombok.Data;
 @Data
 public abstract class ExternalBookApiDto {
     
-    public abstract String getBookId();
+    public abstract String getId();
     public abstract String getTitle();
     public abstract String getDescription();
     public abstract LocalDate getPublishDate();
     public abstract List<String> getGenres();
     public abstract List<String> getAuthorsIds();
-    public abstract Integer getCoverId();
+    public abstract String getCoverUrl();
 
 }
