@@ -9,6 +9,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.emmariescurrena.bookesy.book_service.dtos.OpenLibraryAuthorDto;
 import com.emmariescurrena.bookesy.book_service.dtos.OpenLibraryBookDto;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 @Service
 public class OpenLibraryService implements ExternalBookApiService {
     
@@ -25,40 +28,50 @@ public class OpenLibraryService implements ExternalBookApiService {
     private record OpenLibraryResponse(List<Doc> docs) {};
 
     @Override
-    public List<String> searchBooksIds(String query, Integer page) {
-        OpenLibraryResponse response = webClient
+    public Flux<String> searchBooksIds(String bookName, Integer page) {
+        return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/search.json")
-                        .queryParam("q", query)
+                        .queryParam("q", bookName)
                         .queryParam("page", page)
-                        .queryParam("limit", 20)
+                        .queryParam("limit", 10)
                         .queryParam("fields", "key")
                         .build())
                 .retrieve()
                 .bodyToMono(OpenLibraryResponse.class)
-                .block();
-
-        if (response == null || response.docs == null) {
-            return List.of();
-        }
-
-        return response.docs().stream()
-                .map(Doc::key)
-                .collect(Collectors.toList());
-
+                .flatMapMany(response -> {
+                    if (response == null || response.docs == null) {
+                        return Flux.empty();
+                    }
+                    return Flux.fromIterable(
+                        response.docs.stream()
+                            .map(doc -> doc.key().substring("/works/".length()))
+                            .collect(Collectors.toList())
+                    );
+                });
     }
 
     @Override
-    public OpenLibraryBookDto getBook(String bookId) {
-        //TODO: Define getBook
-        return new OpenLibraryBookDto();
+    public Mono<OpenLibraryBookDto> getBook(String bookId) {
+        return webClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(String.format("/works/%s.json", bookId))
+                        .build())
+                .retrieve()
+                .bodyToMono(OpenLibraryBookDto.class);
     }
 
     @Override
-    public OpenLibraryAuthorDto getAuthor(String authorId) {
-        //TODO: Define getAuthor
-        return new OpenLibraryAuthorDto();
+    public Mono<OpenLibraryAuthorDto> getAuthor(String authorId) {
+        return webClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(String.format("/authors/%s.json", authorId))
+                        .build())
+                .retrieve()
+                .bodyToMono(OpenLibraryAuthorDto.class);
     }
 
 }
