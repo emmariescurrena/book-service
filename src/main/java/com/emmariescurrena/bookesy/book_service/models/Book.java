@@ -1,10 +1,16 @@
 package com.emmariescurrena.bookesy.book_service.models;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
@@ -23,11 +29,19 @@ public class Book {
 
     private String subtitle;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private LocalDate publishDate;
 
     private String coverUrl;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "book_genres",
+        joinColumns = @JoinColumn(name = "book_id"),
+        inverseJoinColumns = @JoinColumn(name = "genre_name")
+    )
+    private List<Genre> genres = new ArrayList<>();
 
 }
