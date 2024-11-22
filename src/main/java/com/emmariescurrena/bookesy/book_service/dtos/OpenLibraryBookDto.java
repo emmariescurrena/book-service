@@ -1,10 +1,13 @@
 package com.emmariescurrena.bookesy.book_service.dtos;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -15,8 +18,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class OpenLibraryBookDto extends ExternalBookApiDto {
 
-    @JsonProperty("key")
-    private String bookId;
+    @JsonProperty("id")
+    private String id;
 
     private String title;
 
@@ -24,15 +27,25 @@ public class OpenLibraryBookDto extends ExternalBookApiDto {
 
     private String description;
 
-    @JsonProperty("first_publish_date")
+    @JsonProperty("publish_date")
     private LocalDate publishDate;
 
-    private List<Integer> covers;
+    @JsonProperty("coverUrl")
+    private String coverUrl;
 
-    @JsonProperty("subjects")
     private List<String> genres;
 
-    private List<Map<String, String>> authors;
+    private List<String> authorsIds;
+
+    @JsonIgnore
+    public String getId() {
+        return id;
+    }
+
+    @JsonProperty("key")
+    public void setId(String key) {
+        this.id = key.substring("/works/".length());
+    }
 
     @Override
     public String getTitle() {
@@ -41,29 +54,102 @@ public class OpenLibraryBookDto extends ExternalBookApiDto {
 
     @JsonProperty("description")
     public void setDescription(JsonNode descriptionNode) {
-        if (descriptionNode != null) {
-            if (descriptionNode.isTextual()) {
-                this.description = descriptionNode.asText();
-            } else if (descriptionNode.has("value")) {
-                this.description = descriptionNode.get("value").asText();
-            }
+        if (descriptionNode == null) {
+            this.description = null;
+        } else if (descriptionNode.isTextual()) {
+            this.description = descriptionNode.asText();
         } else {
-            this.description = "No description available";
+            this.description = descriptionNode.get("value").asText();
         }
     }
 
-    @Override
-    public Integer getCoverId() {
-        return covers != null && !covers.isEmpty() ? covers.get(0) : null;
+    @JsonIgnore
+    public LocalDate getPublishDate() {
+        return publishDate;
     }
 
-    @Override
+
+    @JsonProperty("first_publish_date")
+    public void setPublishDate(String publishDateString) {
+        if (publishDateString == null) {
+            this.publishDate = null;
+            return;
+        }
+
+        // List of possible date formats
+        List<DateTimeFormatter> formatters = List.of(
+            DateTimeFormatter.ofPattern("MMMM d, yyyy"),  // e.g., "June 15, 1974"
+            DateTimeFormatter.ofPattern("MMMM yyyy"),   // e.g., "June 1974"
+            DateTimeFormatter.ofPattern("yyyy") // e.g., "1974"
+        );
+
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                this.publishDate = LocalDate.parse(publishDateString, formatter);
+                return;
+            } catch (DateTimeParseException ignored) {
+                // Try the next pattern
+            }
+        }
+
+        this.publishDate = null;
+        System.err.println("Unable to parse publish date: " + publishDateString);
+    }
+
+    @JsonIgnore
+    public String getCoverUrl() {
+        return coverUrl;
+    }
+
+    @JsonProperty("covers")
+    public void setCoverId(List<Integer> covers) {
+        if (covers == null || covers.isEmpty()) {
+            this.coverUrl = null;
+        } else {
+            this.coverUrl = String.format(
+                "https://covers.openlibrary.org/b/id/%d-M.jpg/",
+                covers.get(0)
+            );
+        }
+    }
+
+    @JsonIgnore
+    public List<String> getGenres() {
+        return genres;
+    }
+
+    @JsonProperty("subjects")
+    public void setGenres(List<String> genres) {
+        this.genres = genres != null ? genres : new ArrayList<>();
+    }
+
+    @JsonIgnore
     public List<String> getAuthorsIds() {
-        List<String> authorsIds = new ArrayList<>();
-        for (Map<String, String> author : authors) {
-            authorsIds.add(author.get("key"));
-        }
         return authorsIds;
+    }
+
+    @JsonProperty("authors")
+    public void setAuthorsIds(List<Map<String, Object>> authors) {
+        this.authorsIds = new ArrayList<>();
+        if (authors == null) {
+            return;
+        }
+        for (Map<String, Object> authorEntry : authors) {
+            if (!authorEntry.containsKey("author")) {
+                continue;
+            }
+            Object authorObj = authorEntry.get("author");
+            if (authorObj instanceof Map == false) {
+                continue;
+            }
+            @SuppressWarnings("unchecked")
+            Map<String, String> author = (Map<String, String>) authorObj;
+            if (author == null || !author.containsKey("key")) {
+                continue;
+            }
+            String authorKey = author.get("key").substring("/authors/".length());
+            this.authorsIds.add(authorKey);
+        }
     }
 
 }
