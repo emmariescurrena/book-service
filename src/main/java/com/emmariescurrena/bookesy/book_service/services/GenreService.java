@@ -8,19 +8,25 @@ import org.springframework.stereotype.Service;
 import com.emmariescurrena.bookesy.book_service.models.Genre;
 import com.emmariescurrena.bookesy.book_service.repositories.GenreRepository;
 
+import reactor.core.publisher.Mono;
+
 @Service
 public class GenreService {
     
     @Autowired
     GenreRepository genreRepository;
 
-    public Genre findOrSaveGenre(Genre genre) {
-        return genreRepository.findById(genre.getId())
-                .orElseGet(() -> genreRepository.save(genre));
-    }
+    public Mono<Genre> findOrSaveGenre(String genreName) {
+        return Mono.defer(() -> {
+            Optional<Genre> optionalGenre = genreRepository.findById(genreName);
+            if (optionalGenre.isPresent()) {
+                return Mono.just(optionalGenre.get());
+            }
 
-    public Optional<Genre> getGenreById(Long id) {
-        return genreRepository.findById(id);
+            Genre genre = new Genre();
+            genre.setName(genreName);
+            return Mono.fromCallable(() -> genreRepository.save(genre));
+        });
     }
 
 }
