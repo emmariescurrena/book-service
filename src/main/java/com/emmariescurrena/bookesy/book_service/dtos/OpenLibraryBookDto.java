@@ -30,8 +30,7 @@ public class OpenLibraryBookDto extends ExternalBookApiDto {
     @JsonProperty("publish_date")
     private LocalDate publishDate;
 
-    @JsonProperty("coverUrl")
-    private String coverUrl;
+    private Integer coverId;
 
     private List<String> genres;
 
@@ -97,19 +96,16 @@ public class OpenLibraryBookDto extends ExternalBookApiDto {
     }
 
     @JsonIgnore
-    public String getCoverUrl() {
-        return coverUrl;
+    public Integer getCoverId() {
+        return coverId;
     }
 
     @JsonProperty("covers")
     public void setCoverId(List<Integer> covers) {
         if (covers == null || covers.isEmpty()) {
-            this.coverUrl = null;
+            this.coverId = null;
         } else {
-            this.coverUrl = String.format(
-                "https://covers.openlibrary.org/b/id/%d-M.jpg/",
-                covers.get(0)
-            );
+            this.coverId = covers.get(0);
         }
     }
 

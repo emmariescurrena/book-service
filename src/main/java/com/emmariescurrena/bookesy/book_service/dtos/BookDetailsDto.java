@@ -28,7 +28,7 @@ public class BookDetailsDto {
 
     private LocalDate publishDate;
 
-    private String coverUrl;
+    private Integer coverId;
 
     private List<Author> authors;
 
