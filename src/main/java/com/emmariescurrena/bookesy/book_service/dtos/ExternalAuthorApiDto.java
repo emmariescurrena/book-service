@@ -7,6 +7,5 @@ public abstract class ExternalAuthorApiDto {
     
     public abstract String getId();
     public abstract String getName();
-    public abstract String getPhotoUrl();
 
 }
