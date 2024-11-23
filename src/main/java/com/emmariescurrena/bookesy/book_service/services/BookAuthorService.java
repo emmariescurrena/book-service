@@ -1,5 +1,7 @@
 package com.emmariescurrena.bookesy.book_service.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -8,13 +10,38 @@ import com.emmariescurrena.bookesy.book_service.models.Book;
 import com.emmariescurrena.bookesy.book_service.models.BookAuthor;
 import com.emmariescurrena.bookesy.book_service.repositories.BookAuthorRepository;
 
+import reactor.core.publisher.Flux;
+
 @Service
 public class BookAuthorService {
     
     @Autowired
     BookAuthorRepository bookAuthorRepository;
 
-    public void linkBookAndAuthor(Book book, Author author) {
+    @Autowired
+    AuthorService authorService;
+
+    public void linkAuthorsToBook(Book book, List<String> authorIds) {
+        if (authorIds == null || authorIds.isEmpty()) {
+            return;
+        }
+
+        Flux.fromIterable(authorIds)
+                .flatMap(authorId -> authorService.findOrSaveAuthor(authorId))
+                .doOnNext(author -> linkBookAndAuthor(book, author));
+    }
+
+    public Flux<Author> getAuthorsByBookId(String bookId) {
+        return Flux.defer(() -> Flux.fromIterable(bookAuthorRepository.findByBookId(bookId)))
+                .map(BookAuthor::getAuthor);
+    }
+
+    public Flux<Book> getBooksByAuthorId(String authorId) {
+        return Flux.defer(() -> Flux.fromIterable(bookAuthorRepository.findByAuthorId(authorId)))
+                .map(BookAuthor::getBook);
+    }
+
+    private void linkBookAndAuthor(Book book, Author author) {
         BookAuthor bookAuthor = new BookAuthor(book, author);
         bookAuthorRepository.save(bookAuthor);
     }
