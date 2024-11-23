@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.emmariescurrena.bookesy.book_service.models.Genre;
 
 @Repository
-public interface GenreRepository extends JpaRepository<Genre, Long> {
-    
+public interface GenreRepository extends JpaRepository<Genre, String> {
+
 }
