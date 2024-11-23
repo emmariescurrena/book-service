@@ -11,7 +11,7 @@ public abstract class ExternalBookApiDto {
     public abstract String getId();
     public abstract String getTitle();
     public abstract String getDescription();
-    public abstract LocalDate getPublishDate();
+    public abstract LocalDate getPublishedDate();
     public abstract List<String> getGenres();
     public abstract List<String> getAuthorsIds();
     public abstract Integer getCoverId();

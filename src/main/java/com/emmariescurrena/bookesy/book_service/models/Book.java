@@ -32,7 +32,7 @@ public class Book {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private LocalDate publishDate;
+    private LocalDate publishedDate;
 
     private Integer coverId;
 

@@ -26,7 +26,7 @@ public class BookDetailsDto {
     @Column(nullable = false)
     private String description;
 
-    private LocalDate publishDate;
+    private LocalDate publishedDate;
 
     private Integer coverId;
 

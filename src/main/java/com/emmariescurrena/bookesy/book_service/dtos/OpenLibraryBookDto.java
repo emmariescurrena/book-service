@@ -27,8 +27,7 @@ public class OpenLibraryBookDto extends ExternalBookApiDto {
 
     private String description;
 
-    @JsonProperty("publish_date")
-    private LocalDate publishDate;
+    private LocalDate publishedDate;
 
     private Integer coverId;
 
@@ -63,15 +62,15 @@ public class OpenLibraryBookDto extends ExternalBookApiDto {
     }
 
     @JsonIgnore
-    public LocalDate getPublishDate() {
-        return publishDate;
+    public LocalDate getPublishedDate() {
+        return publishedDate;
     }
 
 
     @JsonProperty("first_publish_date")
     public void setPublishDate(String publishDateString) {
         if (publishDateString == null) {
-            this.publishDate = null;
+            this.publishedDate = null;
             return;
         }
 
@@ -84,15 +83,15 @@ public class OpenLibraryBookDto extends ExternalBookApiDto {
 
         for (DateTimeFormatter formatter : formatters) {
             try {
-                this.publishDate = LocalDate.parse(publishDateString, formatter);
+                this.publishedDate = LocalDate.parse(publishDateString, formatter);
                 return;
             } catch (DateTimeParseException ignored) {
                 // Try the next pattern
             }
         }
 
-        this.publishDate = null;
-        System.err.println("Unable to parse publish date: " + publishDateString);
+        this.publishedDate = null;
+        System.err.println("Unable to parse published date: " + publishDateString);
     }
 
     @JsonIgnore
