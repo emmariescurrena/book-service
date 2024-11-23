@@ -9,6 +9,6 @@ import com.emmariescurrena.bookesy.book_service.models.BookAuthor;
 
 @Repository
 public interface BookAuthorRepository extends JpaRepository<BookAuthor, Long> {
-    List<BookAuthor> findByAuthor_Id(String authorId);
-    List<BookAuthor> findByBook_Id(String bookId);
+    List<BookAuthor> findByAuthorId(String authorId);
+    List<BookAuthor> findByBookId(String bookId);
 }
