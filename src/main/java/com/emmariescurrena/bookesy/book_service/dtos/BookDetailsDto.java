@@ -28,6 +28,8 @@ public class BookDetailsDto {
 
     private LocalDate publishDate;
 
+    private String coverUrl;
+
     private List<Author> authors;
 
     private List<Genre> genres;

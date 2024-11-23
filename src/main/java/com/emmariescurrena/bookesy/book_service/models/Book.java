@@ -34,6 +34,8 @@ public class Book {
 
     private LocalDate publishDate;
 
+    private String coverUrl;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "book_genres",
