@@ -1,5 +1,6 @@
 package com.emmariescurrena.bookesy.book_service.services;
 
+import java.time.Year;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,7 @@ public class OpenLibraryService implements ExternalBookApiService {
 
     private record Doc(
         @JsonProperty("key") String id,
-        @JsonProperty("first_publish_year") Integer publishYear) {};
+        @JsonProperty("first_publish_year") Year publishYear) {};
 
     private record OpenLibraryResponse(List<Doc> docs) {};
 

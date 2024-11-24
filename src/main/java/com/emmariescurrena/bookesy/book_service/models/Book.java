@@ -1,6 +1,6 @@
 package com.emmariescurrena.bookesy.book_service.models;
 
-import java.time.LocalDate;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class Book {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private LocalDate publishedDate;
+    private Year publishedYear;
 
     private Integer coverId;
 

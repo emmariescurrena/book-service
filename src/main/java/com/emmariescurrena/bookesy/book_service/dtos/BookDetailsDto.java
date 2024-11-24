@@ -1,6 +1,6 @@
 package com.emmariescurrena.bookesy.book_service.dtos;
 
-import java.time.LocalDate;
+import java.time.Year;
 import java.util.List;
 
 import com.emmariescurrena.bookesy.book_service.models.Author;
@@ -26,7 +26,7 @@ public class BookDetailsDto {
     @Column(nullable = false)
     private String description;
 
-    private LocalDate publishedDate;
+    private Year publishedYear;
 
     private Integer coverId;
 
