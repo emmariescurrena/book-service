@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.emmariescurrena.bookesy.book_service.dtos.BookDetailsDto;
+import com.emmariescurrena.bookesy.book_service.dtos.BookSearchResultDto;
 import com.emmariescurrena.bookesy.book_service.models.Author;
 import com.emmariescurrena.bookesy.book_service.models.Book;
 
@@ -33,13 +34,13 @@ public class BookTransactionService {
     OpenLibraryService openLibraryService;
 
     @Transactional
-    public Flux<BookDetailsDto> findOrSaveBooks(List<String> bookIds) {
-        return Flux.fromIterable(bookIds)
+    public Flux<BookDetailsDto> findOrSaveBooks(List<BookSearchResultDto> bookSearchResultDtos) {
+        return Flux.fromIterable(bookSearchResultDtos)
                     .flatMap(this::findOrSaveBook);
     }
 
-    private Mono<BookDetailsDto> findOrSaveBook(String bookId) {
-        return bookService.findOrSaveBook(bookId)
+    private Mono<BookDetailsDto> findOrSaveBook(BookSearchResultDto bookSearchResultDto) {
+        return bookService.findOrSaveBook(bookSearchResultDto)
                           .flatMap(book -> bookAuthorService.getAuthorsByBookId(book.getId())
                                                             .collectList()
                                                             .map(authors -> buildBookDetailsDto(book, authors)));
