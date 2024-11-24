@@ -1,8 +1,5 @@
 package com.emmariescurrena.bookesy.book_service.dtos;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +15,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class OpenLibraryBookDto extends ExternalBookApiDto {
 
-    @JsonProperty("id")
     private String id;
 
     private String title;
@@ -26,8 +22,6 @@ public class OpenLibraryBookDto extends ExternalBookApiDto {
     private String subtitle;
 
     private String description;
-
-    private LocalDate publishedDate;
 
     private Integer coverId;
 
@@ -59,39 +53,6 @@ public class OpenLibraryBookDto extends ExternalBookApiDto {
         } else {
             this.description = descriptionNode.get("value").asText();
         }
-    }
-
-    @JsonIgnore
-    public LocalDate getPublishedDate() {
-        return publishedDate;
-    }
-
-
-    @JsonProperty("first_publish_date")
-    public void setPublishDate(String publishDateString) {
-        if (publishDateString == null) {
-            this.publishedDate = null;
-            return;
-        }
-
-        // List of possible date formats
-        List<DateTimeFormatter> formatters = List.of(
-            DateTimeFormatter.ofPattern("MMMM d, yyyy"),  // e.g., "June 15, 1974"
-            DateTimeFormatter.ofPattern("MMMM yyyy"),   // e.g., "June 1974"
-            DateTimeFormatter.ofPattern("yyyy") // e.g., "1974"
-        );
-
-        for (DateTimeFormatter formatter : formatters) {
-            try {
-                this.publishedDate = LocalDate.parse(publishDateString, formatter);
-                return;
-            } catch (DateTimeParseException ignored) {
-                // Try the next pattern
-            }
-        }
-
-        this.publishedDate = null;
-        System.err.println("Unable to parse published date: " + publishDateString);
     }
 
     @JsonIgnore
