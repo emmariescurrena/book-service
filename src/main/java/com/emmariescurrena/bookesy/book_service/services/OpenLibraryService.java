@@ -10,7 +10,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.emmariescurrena.bookesy.book_service.dtos.BookSearchResultDto;
 import com.emmariescurrena.bookesy.book_service.dtos.OpenLibraryAuthorDto;
 import com.emmariescurrena.bookesy.book_service.dtos.OpenLibraryBookDto;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -27,8 +26,8 @@ public class OpenLibraryService implements ExternalBookApiService {
     }
 
     private record Doc(
-        @JsonProperty("key") String id,
-        @JsonProperty("first_publish_year") Year publishYear) {};
+        String key,
+        Year first_publish_year) {};
 
     private record OpenLibraryResponse(List<Doc> docs) {};
 
@@ -41,7 +40,7 @@ public class OpenLibraryService implements ExternalBookApiService {
                         .queryParam("q", bookName)
                         .queryParam("page", page)
                         .queryParam("limit", 10)
-                        .queryParam("fields", "key", "first_publish_year")
+                        .queryParam("fields", "key,first_publish_year")
                         .build())
                 .retrieve()
                 .bodyToMono(OpenLibraryResponse.class)
@@ -51,8 +50,8 @@ public class OpenLibraryService implements ExternalBookApiService {
                     }
                     return Flux.fromIterable(response.docs.stream()
                         .map(doc -> new BookSearchResultDto(
-                                doc.id().substring("/works/".length()),
-                                doc.publishYear()))
+                                doc.key().substring("/works/".length()),
+                                doc.first_publish_year()))
                         .collect(Collectors.toList()));
                 });
     }
