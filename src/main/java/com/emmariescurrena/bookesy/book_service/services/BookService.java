@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import com.emmariescurrena.bookesy.book_service.dtos.BookSearchResultDto;
 import com.emmariescurrena.bookesy.book_service.models.Book;
 import com.emmariescurrena.bookesy.book_service.models.Genre;
 import com.emmariescurrena.bookesy.book_service.repositories.BookRepository;
@@ -35,13 +36,17 @@ public class BookService {
 
 
     @Cacheable("books")
-    public Mono<Book> findOrSaveBook(String bookId) {
-        return Mono.justOrEmpty(bookRepository.findById(bookId))
+    public Mono<Book> findOrSaveBook(BookSearchResultDto bookSearchResultDto) {
+        return Mono.justOrEmpty(bookRepository.findById(bookSearchResultDto.getBookId()))
             .switchIfEmpty(
-                openLibraryService.getBook(bookId)
+                openLibraryService.getBook(bookSearchResultDto.getBookId())
                     .flatMap(externalBookApiDto -> {
                         Book book = new Book();
                         BeanUtils.copyProperties(externalBookApiDto, book, "genres", "authorsIds");
+
+                        if (bookSearchResultDto.getPublishedYear() != null) {
+                            book.setPublishedYear(bookSearchResultDto.getPublishedYear());
+                        }
 
                         Mono<List<Genre>> genresMono = Flux.fromIterable(
                                 Optional.ofNullable(externalBookApiDto.getGenres()).orElse(List.of()))
