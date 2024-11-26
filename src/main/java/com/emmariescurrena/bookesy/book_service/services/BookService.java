@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.emmariescurrena.bookesy.book_service.dtos.BookSearchResultDto;
+import com.emmariescurrena.bookesy.book_service.exceptions.NotFoundException;
 import com.emmariescurrena.bookesy.book_service.models.Book;
 import com.emmariescurrena.bookesy.book_service.models.Genre;
 import com.emmariescurrena.bookesy.book_service.repositories.BookRepository;
@@ -75,6 +76,14 @@ public class BookService {
             .then(Mono.just(book));
     }
 
+    public Mono<Book> findBook(String bookId) {
+        Optional<Book> optionalBook = bookRepository.findById(bookId);
+        if (optionalBook.isEmpty()) {
+            throw new NotFoundException(String.format("Book with %s id was not found", bookId));
+        }
+
+        return Mono.just(optionalBook.get());
+    }
 
     public void deleteBook(Book book) {
         bookRepository.delete(book);
