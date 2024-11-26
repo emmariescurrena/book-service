@@ -45,6 +45,13 @@ public class BookTransactionService {
                                                             .collectList()
                                                             .map(authors -> buildBookDetailsDto(book, authors)));
     }
+
+    public Mono<BookDetailsDto> findBook(String bookId) {
+        return bookService.findBook(bookId)
+                          .flatMap(book -> bookAuthorService.getAuthorsByBookId(book.getId())
+                                                            .collectList()
+                                                            .map(authors -> buildBookDetailsDto(book, authors)));
+    }
     
 
     private BookDetailsDto buildBookDetailsDto(Book book, List<Author> authors) {
