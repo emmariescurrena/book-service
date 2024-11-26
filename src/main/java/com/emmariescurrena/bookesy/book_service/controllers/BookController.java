@@ -13,6 +13,7 @@ import com.emmariescurrena.bookesy.book_service.services.BookTransactionService;
 import com.emmariescurrena.bookesy.book_service.services.OpenLibraryService;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 
 
@@ -38,5 +39,11 @@ public class BookController {
                                 .collectList()
                                 .flatMapMany(bookTransactionService::findOrSaveBooks);
     }
+
+    @GetMapping("/books/{bookId}")
+    public Mono<BookDetailsDto> getBook(@RequestParam String bookId) {
+        return bookTransactionService.findBook(bookId);
+    }
+    
 
 }
