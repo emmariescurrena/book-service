@@ -29,8 +29,8 @@ public class BookAuthor {
     private Author author;
 
     public BookAuthor(Book book, Author author) {
-        this.book = book;
-        this.author = author;
+        setBook(book);
+        setAuthor(author);
     }
 
 }
