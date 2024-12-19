@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface ExternalBookApiService {
-    Flux<BookSearchResultDto> searchBooksIds(String bookName, Integer page);
+    Flux<BookSearchResultDto> searchBooksIds(String bookName, String authorName, Integer page);
     Mono<? extends ExternalBookApiDto> getBook(String bookId);
     Mono<? extends ExternalAuthorApiDto> getAuthor(String authorId);
 }

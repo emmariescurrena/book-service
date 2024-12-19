@@ -32,12 +32,17 @@ public class OpenLibraryService implements ExternalBookApiService {
     private record OpenLibraryResponse(List<Doc> docs) {};
 
     @Override
-    public Flux<BookSearchResultDto> searchBooksIds(String bookName, Integer page) {
+    public Flux<BookSearchResultDto> searchBooksIds(
+        String bookName,
+        String authorName,
+        Integer page
+    ) {
         return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/search.json")
                         .queryParam("q", bookName)
+                        .queryParam("author", authorName)
                         .queryParam("page", page)
                         .queryParam("limit", 10)
                         .queryParam("fields", "key,first_publish_year")
@@ -80,5 +85,6 @@ public class OpenLibraryService implements ExternalBookApiService {
                 .retrieve()
                 .bodyToMono(OpenLibraryAuthorDto.class);
     }
+
 
 }

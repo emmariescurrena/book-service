@@ -35,8 +35,12 @@ public class BookController {
     OpenLibraryService openLibraryService;
     
     @GetMapping("/books/search")
-    public Flux<BookDetailsDto> searchBooks(@RequestParam String query, @RequestParam Integer page) {
-        return openLibraryService.searchBooksIds(query, page)
+    public Flux<BookDetailsDto> searchBooks(
+        @RequestParam String query,
+        @RequestParam String author,
+        @RequestParam Integer page
+    ) {
+        return openLibraryService.searchBooksIds(query, author, page)
                                 .collectList()
                                 .flatMapMany(bookTransactionService::findOrSaveBooks);
     }
