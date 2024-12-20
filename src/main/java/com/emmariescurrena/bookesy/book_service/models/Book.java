@@ -27,8 +27,6 @@ public class Book {
     @NotEmpty(message = "The title is required")
     private String title;
 
-    private String subtitle;
-
     @Column(columnDefinition = "TEXT")
     private String description;
 
