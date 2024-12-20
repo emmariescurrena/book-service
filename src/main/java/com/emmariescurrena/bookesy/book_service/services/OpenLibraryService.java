@@ -25,11 +25,10 @@ public class OpenLibraryService implements ExternalBookApiService {
         this.webClient = webClientBuilder.baseUrl(OPEN_LIBRARY_URL).build();
     }
 
-    private record Doc(
-        String key,
-        Year first_publish_year) {};
+    private record BookData(String key, Year first_publish_year) {};
 
-    private record OpenLibraryResponse(List<Doc> docs) {};
+    private record OpenLibraryResponseWithDocs(List<BookData> docs) {};
+    private record OpenLibraryResponseWithWorks(List<BookData> works) {};
 
     @Override
     public Flux<BookSearchResultDto> searchBooksIds(
@@ -48,12 +47,35 @@ public class OpenLibraryService implements ExternalBookApiService {
                         .queryParam("fields", "key,first_publish_year")
                         .build())
                 .retrieve()
-                .bodyToMono(OpenLibraryResponse.class)
+                .bodyToMono(OpenLibraryResponseWithDocs.class)
                 .flatMapMany(response -> {
                     if (response == null || response.docs == null) {
                         return Flux.empty();
                     }
                     return Flux.fromIterable(response.docs.stream()
+                        .map(doc -> new BookSearchResultDto(
+                                doc.key().substring("/works/".length()),
+                                doc.first_publish_year()))
+                        .collect(Collectors.toList()));
+                });
+    }
+
+    @Override
+    public Flux<BookSearchResultDto> searchBooksBySubject(String genre, Integer page) {
+        return webClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(String.format("/subjects/%s.json", genre))
+                        .queryParam("offset", page * 10 - 10)
+                        .queryParam("limit", 10)
+                        .build())
+                .retrieve()
+                .bodyToMono(OpenLibraryResponseWithWorks.class)
+                .flatMapMany(response -> {
+                    if (response == null || response.works == null) {
+                        return Flux.empty();
+                    }
+                    return Flux.fromIterable(response.works.stream()
                         .map(doc -> new BookSearchResultDto(
                                 doc.key().substring("/works/".length()),
                                 doc.first_publish_year()))
