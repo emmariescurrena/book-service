@@ -45,10 +45,19 @@ public class BookController {
                                 .flatMapMany(bookTransactionService::findOrSaveBooks);
     }
 
+    @GetMapping("/books/subjects/search")
+    public Flux<BookDetailsDto> searchBooksBySubject(
+        @RequestParam String genre,
+        @RequestParam Integer page
+    ) {
+        return openLibraryService.searchBooksBySubject(genre, page)
+                                .collectList()
+                                .flatMapMany(bookTransactionService::findOrSaveBooks);
+    }
+
     @GetMapping("/books/{bookId}")
     public Mono<BookDetailsDto> getBook(@PathVariable String bookId) {
         return bookTransactionService.findBook(bookId);
     }
     
-
 }
