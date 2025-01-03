@@ -1,5 +1,7 @@
 package com.emmariescurrena.bookesy.book_service.controllers;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +21,7 @@ import reactor.core.publisher.Mono;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/books")
 public class BookController {
     
     @Autowired
@@ -34,10 +36,10 @@ public class BookController {
     @Autowired
     OpenLibraryService openLibraryService;
     
-    @GetMapping("/books/search")
+    @GetMapping("/search")
     public Flux<BookDetailsDto> searchBooks(
-        @RequestParam String query,
-        @RequestParam String author,
+        @RequestParam Optional<String> query,
+        @RequestParam Optional<String> author,
         @RequestParam Integer page
     ) {
         return openLibraryService.searchBooksIds(query, author, page)
@@ -45,7 +47,7 @@ public class BookController {
                                 .flatMapMany(bookTransactionService::findOrSaveBooks);
     }
 
-    @GetMapping("/books/subjects/search")
+    @GetMapping("/subjects/search")
     public Flux<BookDetailsDto> searchBooksBySubject(
         @RequestParam String genre,
         @RequestParam Integer page
@@ -55,7 +57,7 @@ public class BookController {
                                 .flatMapMany(bookTransactionService::findOrSaveBooks);
     }
 
-    @GetMapping("/books/{bookId}")
+    @GetMapping("/{bookId}")
     public Mono<BookDetailsDto> getBook(@PathVariable String bookId) {
         return bookTransactionService.findBook(bookId);
     }
