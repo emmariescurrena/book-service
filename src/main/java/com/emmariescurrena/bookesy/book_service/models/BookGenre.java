@@ -11,16 +11,15 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("books_authors")
-public class BookAuthor {
-    
+@Table("books_genres")
+public class BookGenre {
+
     @Column("book_id")
     @NotNull(message = "The bookId is required")
     private String bookId;
 
-    @Column("author_id")
-    @NotNull(message = "The authorId is required")
-    private String authorId;
-
+    @Column("genre_name")
+    @NotNull(message = "The genreName is required")
+    private String genreName;
 
 }
