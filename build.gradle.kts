@@ -1,6 +1,6 @@
 plugins {
 	java
-	id("org.springframework.boot") version "3.4.0"
+	id("org.springframework.boot") version "3.4.1"
 	id("io.spring.dependency-management") version "1.1.6"
     id("io.freefair.lombok") version "8.10"
 }
@@ -22,8 +22,11 @@ extra["springCloudVersion"] = "2024.0.0"
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+    implementation("org.postgresql:r2dbc-postgresql")
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-	implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
