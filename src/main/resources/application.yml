@@ -1,14 +1,26 @@
 spring:
   application:
     name: book-service
+  main:
+    web-application-type: reactive
   datasource:
-    url: ${BOOK_DB_POSTGRES_URL}
+    url: ${BOOK_DB_POSTGRES_JDBC_URL}
     username: ${BOOK_DB_POSTGRES_USER}
     password: ${BOOK_DB_POSTGRES_PASSWORD}
-  jpa:
-    hibernate:
-      ddl-auto: update
-    open-in-view: false
+  r2dbc:
+    url: ${BOOK_DB_POSTGRES_R2DBC_URL}
+    username: ${BOOK_DB_POSTGRES_USER}
+    password: ${BOOK_DB_POSTGRES_PASSWORD}
+  data:
+    r2dbc:
+      repositories:
+        enabled: true
+  flyway:
+    enabled: true
+    url: ${BOOK_DB_POSTGRES_JDBC_URL}
+    user: ${BOOK_DB_POSTGRES_USER}
+    password: ${BOOK_DB_POSTGRES_PASSWORD}
+    locations: classpath:db/migration
 
 server:
   port: 8082
