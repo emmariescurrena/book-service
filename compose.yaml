@@ -9,7 +9,7 @@ services:
       - 8082:8082
 
   book-service-db:
-    image: "postgres:latest"
+    image: postgres:17.0
     environment:
       - POSTGRES_DB=${BOOK_DB_POSTGRES_DB_NAME}
       - POSTGRES_USER=${BOOK_DB_POSTGRES_USER}
