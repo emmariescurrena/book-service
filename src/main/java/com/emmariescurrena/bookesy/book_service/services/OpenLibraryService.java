@@ -1,7 +1,7 @@
 package com.emmariescurrena.bookesy.book_service.services;
 
-import java.time.Year;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -25,23 +25,23 @@ public class OpenLibraryService implements ExternalBookApiService {
         this.webClient = webClientBuilder.baseUrl(OPEN_LIBRARY_URL).build();
     }
 
-    private record BookData(String key, Year first_publish_year) {};
+    private record BookData(String key, Integer first_publish_year) {};
 
     private record OpenLibraryResponseWithDocs(List<BookData> docs) {};
     private record OpenLibraryResponseWithWorks(List<BookData> works) {};
 
     @Override
     public Flux<BookSearchResultDto> searchBooksIds(
-        String bookName,
-        String authorName,
+        Optional<String> query,
+        Optional<String> authorName,
         Integer page
     ) {
         return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/search.json")
-                        .queryParam("q", bookName)
-                        .queryParam("author", authorName)
+                        .queryParamIfPresent("q", query)
+                        .queryParamIfPresent("author", authorName)
                         .queryParam("page", page)
                         .queryParam("limit", 10)
                         .queryParam("fields", "key,first_publish_year")
