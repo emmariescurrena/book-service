@@ -1,6 +1,5 @@
 package com.emmariescurrena.bookesy.book_service.dtos;
 
-import java.time.Year;
 import java.util.List;
 
 import com.emmariescurrena.bookesy.book_service.models.Author;
@@ -21,12 +20,10 @@ public class BookDetailsDto {
     @NotEmpty(message = "The title is required")
     private String title;
 
-    private String subtitle;
-
     @Column(nullable = false)
     private String description;
 
-    private Year publishedYear;
+    private Integer publishedYear;
 
     private Integer coverId;
 
