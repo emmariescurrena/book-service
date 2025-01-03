@@ -1,26 +1,34 @@
 package com.emmariescurrena.bookesy.book_service.models;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@Entity
-@Table(name = "GENRES")
-public class Genre {
+@AllArgsConstructor
+@Table("genres")
+public class Genre implements Persistable<String> {
     
     @Id
+    @NotNull(message = "Name is required")
     private String name;
 
-    @ManyToMany(mappedBy = "genres")
+    @Override
+    public String getId() {
+        return name;
+    }
+
+
+    @Override
     @JsonIgnore
-    private List<Book> books = new ArrayList<>();
+    public boolean isNew() {
+        return true;
+    }
 
 }

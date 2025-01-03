@@ -1,20 +1,28 @@
 package com.emmariescurrena.bookesy.book_service.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 
 @Data
-@Entity
-@Table(name = "AUTHORS")
-public class Author {
+@Table("authors")
+public class Author implements Persistable<String> {
     
     @Id
     private String id;
 
-    @Column(nullable = false)
+    @Column("name")
     private String name;
+
+    @Override
+    @JsonIgnore
+    public boolean isNew() {
+        return true;
+    }
 
 }

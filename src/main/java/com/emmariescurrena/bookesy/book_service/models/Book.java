@@ -1,45 +1,36 @@
 package com.emmariescurrena.bookesy.book_service.models;
 
-import java.time.Year;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
-@Entity
-@Table(name = "BOOKS")
-public class Book {
+@Table("books")
+public class Book implements Persistable<String>{
     
     @Id
     private String id;
 
-    @Column(nullable = false)
+    @Column("title")
     @NotEmpty(message = "The title is required")
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column("description")
     private String description;
 
-    private Year publishedYear;
+    @Column("published_year")
+    private Integer publishedYear;
 
+    @Column("cover_id")
     private Integer coverId;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "book_genres",
-        joinColumns = @JoinColumn(name = "book_id"),
-        inverseJoinColumns = @JoinColumn(name = "genre_name")
-    )
-    private List<Genre> genres = new ArrayList<>();
+    @Override
+    public boolean isNew() {
+        return true;
+    }
 
 }
