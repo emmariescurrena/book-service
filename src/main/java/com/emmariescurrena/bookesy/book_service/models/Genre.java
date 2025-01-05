@@ -6,6 +6,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +25,9 @@ public class Genre implements Persistable<String> {
         return name;
     }
 
+    @Transient
+    @JsonIgnore
+    private String id;
 
     @Override
     @JsonIgnore
