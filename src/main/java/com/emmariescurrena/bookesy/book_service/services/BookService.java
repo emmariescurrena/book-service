@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.emmariescurrena.bookesy.book_service.dtos.BookSearchResultDto;
@@ -35,7 +36,7 @@ public class BookService {
     @Autowired
     private BookGenreService bookGenreService;
 
-
+    @Cacheable(value = "books", key = "#bookSearchResultDto.bookId")
     public Mono<Book> findOrSaveBook(BookSearchResultDto bookSearchResultDto) {
         return bookRepository.findById(bookSearchResultDto.getBookId())
             .switchIfEmpty(
@@ -73,8 +74,6 @@ public class BookService {
         if (genresNames == null || genresNames.isEmpty()) {
             return Mono.empty();
         }
-
-
 
         return Flux.fromIterable(genresNames)
         .flatMap(genreService::findOrSaveGenre)
