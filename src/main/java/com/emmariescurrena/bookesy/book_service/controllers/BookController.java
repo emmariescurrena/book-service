@@ -47,8 +47,8 @@ public class BookController {
                                 .flatMapMany(bookTransactionService::findOrSaveBooks);
     }
 
-    @GetMapping("/subjects/search")
-    public Flux<BookDetailsDto> searchBooksBySubject(
+    @GetMapping("/genres/search")
+    public Flux<BookDetailsDto> searchBooksByGenre(
         @RequestParam String genre,
         @RequestParam Integer page
     ) {
