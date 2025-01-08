@@ -13,5 +13,7 @@ public abstract class ExternalBookApiDto {
     public abstract List<String> getGenres();
     public abstract List<String> getAuthorsIds();
     public abstract Integer getCoverId();
+    public abstract Double getAverageRating();
+    public abstract Integer getRatingCount();
 
 }

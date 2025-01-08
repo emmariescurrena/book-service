@@ -3,7 +3,9 @@ CREATE TABLE IF NOT EXISTS books (
     title VARCHAR(1000) NOT NULL,
     description TEXT,
     published_year INTEGER,
-    cover_id INTEGER
+    cover_id INTEGER,
+    average_rating DOUBLE PRECISION DEFAULT 0.0,
+    rating_count INTEGER DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS genres (

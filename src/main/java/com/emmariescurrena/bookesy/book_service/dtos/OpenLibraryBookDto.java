@@ -16,18 +16,14 @@ import lombok.EqualsAndHashCode;
 public class OpenLibraryBookDto extends ExternalBookApiDto {
 
     private String id;
-
     private String title;
-
     private String subtitle;
-
     private String description;
-
     private Integer coverId;
-
     private List<String> genres;
-
     private List<String> authorsIds;
+    private Double averageRating;
+    private Integer ratingCount;
 
     @JsonIgnore
     public String getId() {

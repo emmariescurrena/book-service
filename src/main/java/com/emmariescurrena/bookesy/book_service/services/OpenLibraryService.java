@@ -1,21 +1,28 @@
 package com.emmariescurrena.bookesy.book_service.services;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.emmariescurrena.bookesy.book_service.dtos.BookRatingDto;
 import com.emmariescurrena.bookesy.book_service.dtos.BookSearchResultDto;
 import com.emmariescurrena.bookesy.book_service.dtos.OpenLibraryAuthorDto;
 import com.emmariescurrena.bookesy.book_service.dtos.OpenLibraryBookDto;
+import com.emmariescurrena.bookesy.book_service.dtos.OpenLibraryRatingsResponse;
+import com.emmariescurrena.bookesy.book_service.dtos.OpenLibraryResponseWithDocs;
+import com.emmariescurrena.bookesy.book_service.dtos.OpenLibraryResponseWithWorks;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
 public class OpenLibraryService implements ExternalBookApiService {
+
+    private Logger log = LoggerFactory.getLogger(OpenLibraryService.class);
 
     private String OPEN_LIBRARY_URL = "https://openlibrary.org";
 
@@ -24,11 +31,6 @@ public class OpenLibraryService implements ExternalBookApiService {
     public OpenLibraryService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl(OPEN_LIBRARY_URL).build();
     }
-
-    private record BookData(String key, Integer first_publish_year) {};
-
-    private record OpenLibraryResponseWithDocs(List<BookData> docs) {};
-    private record OpenLibraryResponseWithWorks(List<BookData> works) {};
 
     @Override
     public Flux<BookSearchResultDto> searchBooksIds(
@@ -43,16 +45,16 @@ public class OpenLibraryService implements ExternalBookApiService {
                         .queryParamIfPresent("q", query)
                         .queryParamIfPresent("author", authorName)
                         .queryParam("page", page)
-                        .queryParam("limit", 10)
+                        .queryParam("limit", 20)
                         .queryParam("fields", "key,first_publish_year")
                         .build())
                 .retrieve()
                 .bodyToMono(OpenLibraryResponseWithDocs.class)
                 .flatMapMany(response -> {
-                    if (response == null || response.docs == null) {
+                    if (response == null || response.docs() == null) {
                         return Flux.empty();
                     }
-                    return Flux.fromIterable(response.docs.stream()
+                    return Flux.fromIterable(response.docs().stream()
                         .map(doc -> new BookSearchResultDto(
                                 doc.key().substring("/works/".length()),
                                 doc.first_publish_year()))
@@ -67,15 +69,15 @@ public class OpenLibraryService implements ExternalBookApiService {
                 .uri(uriBuilder -> uriBuilder
                         .path(String.format("/subjects/%s.json", genre))
                         .queryParam("offset", page * 10 - 10)
-                        .queryParam("limit", 10)
+                        .queryParam("limit", 20)
                         .build())
                 .retrieve()
                 .bodyToMono(OpenLibraryResponseWithWorks.class)
                 .flatMapMany(response -> {
-                    if (response == null || response.works == null) {
+                    if (response == null || response.works() == null) {
                         return Flux.empty();
                     }
-                    return Flux.fromIterable(response.works.stream()
+                    return Flux.fromIterable(response.works().stream()
                         .map(doc -> new BookSearchResultDto(
                                 doc.key().substring("/works/".length()),
                                 doc.first_publish_year()))
@@ -85,16 +87,25 @@ public class OpenLibraryService implements ExternalBookApiService {
 
     @Override
     public Mono<OpenLibraryBookDto> getBook(String bookId) {
-        
-        Mono<OpenLibraryBookDto> result = webClient
-                                    .get()
-                                    .uri(uriBuilder -> uriBuilder
-                                    .path(String.format("/works/%s.json", bookId))
-                                    .build())
-                                    .retrieve()
-                                    .bodyToMono(OpenLibraryBookDto.class);
-        
-        return result;
+        return webClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(String.format("/works/%s.json", bookId))
+                        .build())
+                .retrieve()
+                .bodyToMono(OpenLibraryBookDto.class)
+                .flatMap(book -> {
+                    return getBookRating(bookId)
+                    .flatMap(ratingResponse -> {
+                        log.info("Received response: " + ratingResponse.toString());
+                        log.info("Average rating: " + ratingResponse.averageRating());
+                        log.info("Rating count: " + ratingResponse.ratingCount());
+                        book.setAverageRating(ratingResponse.averageRating());
+                        book.setRatingCount(ratingResponse.ratingCount());
+                        log.info("Book with rating: " + book.toString());
+                        return Mono.just(book);
+                    });
+                });
     }
 
     @Override
@@ -108,5 +119,17 @@ public class OpenLibraryService implements ExternalBookApiService {
                 .bodyToMono(OpenLibraryAuthorDto.class);
     }
 
+    private Mono<BookRatingDto> getBookRating(String bookId) {
+        return webClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(String.format("/works/%s/ratings.json", bookId))
+                        .build())
+                .retrieve()
+                .bodyToMono(OpenLibraryRatingsResponse.class)
+                .doOnNext(response -> log.info(response.toString()))
+                .map(response -> new BookRatingDto(response.getAverageRating(), response.getRatingCount()))
+                .defaultIfEmpty(new BookRatingDto(0.0, 0));
+    }
 
 }

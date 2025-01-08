@@ -28,6 +28,12 @@ public class Book implements Persistable<String>{
     @Column("cover_id")
     private Integer coverId;
 
+    @Column("average_rating")
+    private Double averageRating;
+
+    @Column("rating_count")
+    private Integer ratingCount;
+
     @Override
     public boolean isNew() {
         return true;
