@@ -3,8 +3,6 @@ package com.emmariescurrena.bookesy.book_service.services;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -21,8 +19,6 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class OpenLibraryService implements ExternalBookApiService {
-
-    private Logger log = LoggerFactory.getLogger(OpenLibraryService.class);
 
     private String OPEN_LIBRARY_URL = "https://openlibrary.org";
 
@@ -97,12 +93,8 @@ public class OpenLibraryService implements ExternalBookApiService {
                 .flatMap(book -> {
                     return getBookRating(bookId)
                     .flatMap(ratingResponse -> {
-                        log.info("Received response: " + ratingResponse.toString());
-                        log.info("Average rating: " + ratingResponse.averageRating());
-                        log.info("Rating count: " + ratingResponse.ratingCount());
                         book.setAverageRating(ratingResponse.averageRating());
                         book.setRatingCount(ratingResponse.ratingCount());
-                        log.info("Book with rating: " + book.toString());
                         return Mono.just(book);
                     });
                 });
@@ -127,7 +119,6 @@ public class OpenLibraryService implements ExternalBookApiService {
                         .build())
                 .retrieve()
                 .bodyToMono(OpenLibraryRatingsResponse.class)
-                .doOnNext(response -> log.info(response.toString()))
                 .map(response -> new BookRatingDto(response.getAverageRating(), response.getRatingCount()))
                 .defaultIfEmpty(new BookRatingDto(0.0, 0));
     }
