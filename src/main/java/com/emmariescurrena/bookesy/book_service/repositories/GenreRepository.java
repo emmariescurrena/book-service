@@ -11,8 +11,11 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface GenreRepository extends ReactiveCrudRepository<Genre, String> {
+
+    @Query("SELECT * FROM genres WHERE name = $1")
     Mono<Genre> findByName(String name);
 
     @Query("INSERT INTO genres (name) VALUES (:name) ON CONFLICT (name) DO NOTHING RETURNING *")
     Mono<Genre> saveIfNotExists(@Param("name") String name);
+
 }
